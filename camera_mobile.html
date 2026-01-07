@@ -1,0 +1,39 @@
+<video id="video" autoplay playsinline muted style="width:100%"></video>
+<br>
+<button id="start">Start Camera</button>
+<button id="photoBtn">Take Photo</button>
+<canvas id="canvas" style="display:none;"></canvas>
+<img id="photo" style="width:100px;">
+
+<script>
+let stream;
+
+document.getElementById('start').addEventListener('click', async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" }, // back camera
+      audio: false // set true if you need audio
+    });
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    await video.play();
+    alert("Camera started!");
+  } catch(err) {
+    alert("Camera access failed: " + err);
+    console.error(err);
+  }
+});
+
+document.getElementById('photoBtn').addEventListener('click', () => {
+  if(!stream) { alert("Start camera first!"); return; }
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const photo = document.getElementById('photo');
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+
+  photo.src = canvas.toDataURL('image/png');
+});
+</script>
