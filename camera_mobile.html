@@ -1,23 +1,35 @@
-<video id="video" autoplay playsinline muted style="width:100%"></video>
+<video id="video" autoplay playsinline muted style="width:100%; height:auto; background:#000;"></video>
 <br>
 <button id="start">Start Camera</button>
 <button id="photoBtn">Take Photo</button>
 <canvas id="canvas" style="display:none;"></canvas>
-<img id="photo" style="width:100px;">
+<img id="photo" style="width:100px; margin-top:10px;">
 
 <script>
 let stream;
 
 document.getElementById('start').addEventListener('click', async () => {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" }, // back camera
-      audio: false // set true if you need audio
-    });
+    // ⚡ Mobile-friendly constraints
+    const constraints = {
+      video: {
+        facingMode: { exact: "environment" }, // back camera preferred
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    };
+
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+
     const video = document.getElementById('video');
     video.srcObject = stream;
-    await video.play();
-    alert("Camera started!");
+
+    // ⚡ Mobile requires explicit play
+    video.onloadedmetadata = () => {
+      video.play().catch(err => console.error("Video play failed:", err));
+    };
+
   } catch(err) {
     alert("Camera access failed: " + err);
     console.error(err);
@@ -30,8 +42,8 @@ document.getElementById('photoBtn').addEventListener('click', () => {
   const canvas = document.getElementById('canvas');
   const photo = document.getElementById('photo');
 
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
   canvas.getContext('2d').drawImage(video, 0, 0);
 
   photo.src = canvas.toDataURL('image/png');
