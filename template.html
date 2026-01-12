@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mobile App Prototype</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    background: #000;
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Main content area */
+  #app {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  /* Bottom navbar */
+  #navbar {
+    height: 70px;
+    background: #111;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #222;
+  }
+
+  .nav-btn {
+    color: #aaa;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .nav-btn.active {
+    color: #00ffcc;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="app">
+  <div id="content">Home</div>
+</div>
+
+<div id="navbar">
+  <div class="nav-btn active" onclick="switchTab('Home', this)">Home</div>
+  <div class="nav-btn" onclick="switchTab('Journeys', this)">Journeys</div>
+  <div class="nav-btn" onclick="switchTab('Friends', this)">Friends</div>
+  <div class="nav-btn" onclick="switchTab('Profile', this)">Profile</div>
+</div>
+
+<script>
+  function switchTab(name, el) {
+    document.getElementById("content").innerText = name;
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+    el.classList.add("active");
+  }
+</script>
+
+</body>
+</html>
