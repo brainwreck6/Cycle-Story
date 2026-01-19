@@ -222,6 +222,15 @@ body {
   </div>
 </div>
 
+  <!-- TIMER -->
+<div id="timer" class="page">
+  <div class="header">CycleStory</div>
+
+  <div class="card red" onclick="showPage('home",this)">
+    Cancel a ride
+  </div>
+</div>
+
 <script>
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
