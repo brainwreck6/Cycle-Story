@@ -11,6 +11,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     margin: 0;
     padding: 0;
+    color: #026A49 
   }
 
   
@@ -23,9 +24,7 @@
     color: #1f2937;
   }
 
-  * {
-  color: #026A49 !important;
-  }
+  
 
 
   .page {
@@ -472,6 +471,7 @@
     .center-control {
       position: relative;
       z-index: 10;
+      color: #ffffff;
     }
 
     .btn-control-capture {
@@ -1159,6 +1159,35 @@
   background: #f0f0f0;
 }
 
+/* Delete Button Styles */
+.journey-delete-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.journey-delete-btn:hover {
+    background: #dc2626;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.adventure-card {
+    position: relative; /* Important for absolute positioning of delete button */
+}
 
   </style>
   </head>
@@ -1432,30 +1461,30 @@
 
     <!-- Bottom Controls Section -->
     <div class="bottom-controls-container">
-      <!-- Left Side: Stop Button -->
-      <div class="side-control left-control" id="stopControl">
-        <button class="btn btn-control-stop" onclick="stopTimer()">
-          <i class="fas fa-stop"></i>
-          <span>Stop</span>
-        </button>
-      </div>
-      
-      <!-- Center: Capture Button -->
-      <div class="center-control">
-        <button class="btn btn-control-capture" onclick="showModal('captureModal')">
-          <i class="fas fa-camera"></i>
-          <span>Capture</span>
-        </button>
-      </div>
-      
-      <!-- Right Side: Start/Pause Button -->
-      <div class="side-control right-control" id="timerControl">
-        <button class="btn btn-control-start" onclick="toggleTimer()" id="timerToggleBtn">
-          <i class="fas fa-play"></i>
-          <span>Start</span>
-        </button>
-      </div>
-    </div>
+  <!-- Left Side: Stop Button -->
+  <div class="side-control left-control" id="stopControl">
+    <button class="btn btn-control-stop" onclick="stopTimer()" style="color: white;">
+      <i class="fas fa-stop" style="color: white;"></i>
+      <span style="color: white;">Stop</span>
+    </button>
+  </div>
+  
+  <!-- Center: Capture Button -->
+  <div class="center-control">
+    <button class="btn btn-control-capture" onclick="showModal('captureModal')" style="color: white;">
+      <i class="fas fa-camera " style="color: white;"></i>
+      <span" style="color: white;">Capture</span>
+    </button>
+  </div>
+  
+  <!-- Right Side: Start/Pause Button -->
+  <div class="side-control right-control" id="timerControl">
+    <button class="btn btn-control-start" onclick="toggleTimer()" id="timerToggleBtn" style="color: white;">
+      <i class="fas fa-play" style="color: white;"></i>
+      <span style="color: white;">Start</span>
+    </button>
+  </div>
+</div>
 
     
   </div>
@@ -2155,13 +2184,14 @@ function closeAudioModal() {
     }
   }
 
- function updateJourneysList() {
+function updateJourneysList() {
     const container = document.getElementById('journeysList');
     container.innerHTML = '';
     
-    journeys.forEach(journey => {
+    journeys.forEach((journey, journeyIndex) => {
       const journeyElement = document.createElement('div');
       journeyElement.className = 'adventure-card';
+      journeyElement.id = `journey-${journeyIndex}`;
       
       // Create media row if journey has media
       let mediaRow = '';
@@ -2203,6 +2233,11 @@ function closeAudioModal() {
       }
       
       journeyElement.innerHTML = `
+        <!-- Delete Button (top right) -->
+        <button class="journey-delete-btn" onclick="deleteJourney(${journeyIndex})" title="Delete Journey">
+          <i class="fas fa-times"></i>
+        </button>
+        
         <div class="adventure-image">
           <i class="${journey.icon}"></i>
         </div>
@@ -2229,8 +2264,21 @@ function closeAudioModal() {
       `;
       container.appendChild(journeyElement);
     });
-  }
+}
 
+// Function to delete a journey
+function deleteJourney(index) {
+    // Show confirmation dialog
+    
+      // Remove the journey from the array
+      journeys.splice(index, 1);
+      
+      // Refresh the journeys list
+      updateJourneysList();
+      
+  
+    
+}
   // Profile Functions
   function updateProfile() {
     updateProfileStats();
@@ -2419,43 +2467,63 @@ function closeAudioModal() {
     selectCaptureType('camera');
   }
 
-  async function initializeCamera() {
-    try {
-      stopAllMedia();
-      
-      const constraints = {
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: currentCaptureType === 'video' || currentCaptureType === 'audio'
-      };
-      
-      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if (currentCaptureType === 'camera' || currentCaptureType === 'video') {
-        const videoPreview = document.getElementById('videoPreview');
-        videoPreview.srcObject = mediaStream;
-        videoPreview.classList.add('active');
-        document.getElementById('previewPlaceholder').style.display = 'none';
-        videoPreview.play();
-      }
-    } catch (error) {
-      console.error('Error accessing media devices:', error);
-      alert('Could not access camera. Please check permissions.');
-    }
-  }
 
-  function switchCamera() {
-    // In a real app, this would switch between front/back cameras
-    alert('Switching camera (front/back)...');
+  let currentCamera = 'environment'; // 'environment' for back, 'user' for front
+
+function switchCamera() {
+    // Toggle between front and back cameras
+    if (currentCamera === 'environment') {
+        currentCamera = 'user'; // Switch to front camera
+    } else {
+        currentCamera = 'environment'; // Switch to back camera
+    }
+    
+    // Reinitialize camera with new facing mode
     initializeCamera();
-  }
+}
+
+async function initializeCamera() {
+    try {
+        stopAllMedia();
+        
+        const constraints = {
+            video: {
+                facingMode: currentCamera,
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: currentCaptureType === 'video' || currentCaptureType === 'audio'
+        };
+        
+        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        if (currentCaptureType === 'camera' || currentCaptureType === 'video') {
+            const videoPreview = document.getElementById('videoPreview');
+            videoPreview.srcObject = mediaStream;
+            videoPreview.classList.add('active');
+            document.getElementById('previewPlaceholder').style.display = 'none';
+            videoPreview.play();
+            
+            // Update camera icon based on current camera
+            updateCameraIcon();
+        }
+    } catch (error) {
+        //console.error('Error accessing media devices:', error);
+        
+        // Fallback to default if specific facingMode fails
+        if (error.name === 'OverconstrainedError') {
+            //alert('This camera mode is not available. Using default camera.');
+            currentCamera = { exact: 'environment' }; // Try exact constraint
+            setTimeout(initializeCamera, 100);
+        } else {
+            //alert('Could not access camera. Please check permissions.');
+        }
+    }
+}
 
   function takePhoto() {
     if (!mediaStream) {
-      alert('Camera not initialized. Please try again.');
+      //alert('Camera not initialized. Please try again.');
       return;
     }
     
@@ -2491,7 +2559,7 @@ function closeAudioModal() {
 
   function startRecording() {
     if (!mediaStream) {
-      alert('Camera not initialized. Please try again.');
+      //alert('Camera not initialized. Please try again.');
       return;
     }
     
@@ -2597,8 +2665,8 @@ function closeAudioModal() {
         document.getElementById('stopAudioBtn').classList.remove('hidden');
       })
       .catch(error => {
-        console.error('Error accessing microphone:', error);
-        alert('Could not access microphone. Please check permissions.');
+        //console.error('Error accessing microphone:', error);
+        //alert('Could not access microphone. Please check permissions.');
       });
   }
 
