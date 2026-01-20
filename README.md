@@ -13,6 +13,11 @@
 
 ## Any limitations of the implementation
 
-- There is no working cloud-based storage, because of that all of the data is lost after the person leaves the website and closes the tab.
+- There is no working cloud-based storage, because of that all of the data is lost after the person leaves the website and closes the tab
+- location is faked with WoZ tehnique
+- fake starting list of friends
+- does not sync with other users
+- profile info is hard-coded (although editable)
+- achivements are hard-coded (cannot be editable)
 
 
